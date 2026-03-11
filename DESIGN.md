@@ -8,7 +8,6 @@ Dự án được tổ chức theo cấu trúc sau:
 │   ├── base_crawler.py     # Lớp cơ sở (BaseCrawler) định nghĩa các phương thức và luồng crawl chuẩn
 │   ├── factory.py          # Pattern Factory để tạo ra đối tượng crawler tương ứng dựa vào tên trang web
 │   ├── vnexpress.py        # Logic thu thập dữ liệu cụ thể cho VNExpress
-│   ├── dantri.py           # Logic thu thập dữ liệu cụ thể cho DanTri
 │   └── vietnamnet.py       # Logic thu thập dữ liệu cụ thể cho VietNamNet
 ├── logger/                 # Module cung cấp tiện ích logging
 │   ├── log.py              # File chứa các hàm cấu hình logging
@@ -67,7 +66,7 @@ Chương trình hỗ trợ hai chế độ (task) chính: "url" (Crawl danh sác
 ### `crawler/factory.py`
 - `get_crawler(webname, **kwargs)`: Trả về instance của Crawler tùy thuộc vào tên trang web (vd: VNExpressCrawler).
 
-### Các lớp con kế thừa BaseCrawler (`vnexpress.py`, `dantri.py`, `vietnamnet.py`)
+### Các lớp con kế thừa BaseCrawler (`vnexpress.py`, `vietnamnet.py`)
 - `extract_content(self, url)`: Ghi đè logic bóc tách HTML DOM (dựa trên class cụ thể của thẻ div, h1, p,... cho từng trang báo mạng khác nhau).
 - `get_urls_of_type_thread(self, article_type, page_number)`: Ghi đè logic lấy URL dựa trên cách xây dựng đường link phân trang của từng tờ báo mạng.
 

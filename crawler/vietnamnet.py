@@ -73,19 +73,11 @@ class VietNamNetCrawler(BaseCrawler):
         if title == None:
             return False
 
-        with open(output_fpath, "w", encoding="utf-8") as file:
-            file.write(title + "\n")
+        # Use list() if generators
+        desc_list = list(description) if description else []
+        p_list = list(paragraphs) if paragraphs else []
 
-            # Use list() if generators
-            desc_list = list(description) if description else []
-            p_list = list(paragraphs) if paragraphs else []
-
-            for p in desc_list:
-                file.write(p + "\n")
-            for p in p_list:
-                file.write(p + "\n")
-
-        # Save to DB
+        # Save to DB instead of .txt
         self.save_to_db(url, title, desc_list, p_list)
 
         return True

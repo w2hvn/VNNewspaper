@@ -40,8 +40,6 @@ class BaseCrawler(ABC):
         website = getattr(self, "base_url", "Unknown")
         if "vnexpress" in url:
             website = "VNExpress"
-        elif "dantri" in url:
-            website = "DanTri"
         elif "vietnamnet" in url:
             website = "VietNamNet"
 

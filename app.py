@@ -14,11 +14,10 @@ st.set_page_config(page_title="VNNewspaper Crawler", layout="wide", page_icon="�
 init_db()
 
 # Các tùy chọn cho website và chuyên mục
-websites = ["vnexpress", "dantri", "vietnamnet"]
+websites = ["vnexpress", "vietnamnet"]
 # Ánh xạ cơ bản danh mục từ crawler
 categories_map = {
     "vnexpress": ["thoi-su", "du-lich", "the-gioi", "kinh-doanh", "khoa-hoc", "giai-tri", "the-thao", "phap-luat", "giao-duc", "suc-khoe", "doi-song", "all"],
-    "dantri": ["xa-hoi", "the-gioi", "kinh-doanh", "bat-dong-san", "the-thao", "lao-dong-viec-lam", "tam-long-nhan-ai", "suc-khoe", "van-hoa", "giai-tri", "suc-manh-so", "giao-duc", "an-sinh", "phap-luat", "all"],
     "vietnamnet": ["thoi-su", "kinh-doanh", "the-thao", "van-hoa", "giai-tri", "the-gioi", "doi-song", "giao-duc", "suc-khoe", "thong-tin-truyen-thong", "phap-luat", "oto-xe-may", "bat-dong-san", "du-lich", "all"]
 }
 
