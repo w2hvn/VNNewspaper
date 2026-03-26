@@ -1,6 +1,6 @@
 # crawler_config.yml
 
-# Name of news website that want to crawls (vnexpress, dantri, vietnamnet)
+# Name of news website that want to crawls (vnexpress, vietnamnet)
 webname: "vietnamnet"
 
 # tasks = ["url", "type"]

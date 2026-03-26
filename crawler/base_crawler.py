@@ -34,9 +34,37 @@ class BaseCrawler(ABC):
 
         return True
     
+    def save_to_db(self, url, title, description, paragraphs):
+        """ Save content to SQLite DB """
+        from database.db_manager import save_article
+        website = getattr(self, "base_url", "Unknown")
+        if "vnexpress" in url:
+            website = "VNExpress"
+        elif "vietnamnet" in url:
+            website = "VietNamNet"
+
+        category_or_keyword = ""
+        if hasattr(self, "task"):
+            if self.task == "type" and hasattr(self, "article_type"):
+                category_or_keyword = self.article_type
+            elif self.task == "keyword" and hasattr(self, "keyword"):
+                category_or_keyword = self.keyword
+
+        desc_text = "\n".join(description) if description else ""
+        content_text = "\n".join(paragraphs) if paragraphs else ""
+        return save_article(url, website, category_or_keyword, title, desc_text, content_text)
+
     @abstractmethod
     def get_urls_of_type_thread(self, article_type, page_number):
         """" Get urls of articles in a specific type in a page"""
+
+        articles_urls = list()
+
+        return articles_urls
+
+    @abstractmethod
+    def get_urls_of_keyword_thread(self, keyword, page_number):
+        """" Get urls of articles by keyword search in a page"""
 
         articles_urls = list()
 
@@ -48,6 +76,8 @@ class BaseCrawler(ABC):
             error_urls = self.crawl_urls(self.urls_fpath, self.output_dpath)
         elif self.task=="type":
             error_urls = self.crawl_types()
+        elif self.task=="keyword":
+            error_urls = self.crawl_keyword()
 
         self.logger.info(f"The number of failed URL: {len(error_urls)}")
 
@@ -81,6 +111,26 @@ class BaseCrawler(ABC):
             return url
         else:
             return None
+
+    def crawl_keyword(self):
+        """ Crawling contents by keyword """
+        urls_dpath, results_dpath = init_output_dirs(self.output_dpath)
+        self.logger.info(f"Crawl articles by keyword {self.keyword}")
+        error_urls = list()
+
+        # getting urls
+        self.logger.info(f"Getting urls of {self.keyword}...")
+        articles_urls = self.get_urls_of_keyword(self.keyword)
+        articles_urls_fpath = "/".join([urls_dpath, f"{self.keyword}.txt"])
+        with open(articles_urls_fpath, "w", encoding="utf-8") as urls_file:
+            urls_file.write("\n".join(articles_urls))
+
+        # crawling urls
+        self.logger.info(f"Crawling from urls of {self.keyword}...")
+        results_keyword_dpath = "/".join([results_dpath, self.keyword])
+        error_urls = self.crawl_urls(articles_urls_fpath, results_keyword_dpath)
+
+        return error_urls
 
     def crawl_types(self):
         """ Crawling contents of a specific type or all types """
@@ -135,4 +185,16 @@ class BaseCrawler(ABC):
         articles_urls = sum(results, [])
         articles_urls = list(set(articles_urls))
     
+        return articles_urls
+
+    def get_urls_of_keyword(self, keyword):
+        """" Get urls of articles by keyword search """
+        articles_urls = list()
+        args = ([keyword]*self.total_pages, range(1, self.total_pages+1))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_workers) as executor:
+            results = list(tqdm(executor.map(self.get_urls_of_keyword_thread, *args), total=self.total_pages, desc="Pages"))
+
+        articles_urls = sum(results, [])
+        articles_urls = list(set(articles_urls))
+
         return articles_urls

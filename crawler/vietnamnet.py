@@ -73,15 +73,35 @@ class VietNamNetCrawler(BaseCrawler):
         if title == None:
             return False
 
-        with open(output_fpath, "w", encoding="utf-8") as file:
-            file.write(title + "\n")
-            for p in description:
-                file.write(p + "\n")
-            for p in paragraphs:                     
-                file.write(p + "\n")
+        # Use list() if generators
+        desc_list = list(description) if description else []
+        p_list = list(paragraphs) if paragraphs else []
+
+        # Save to DB instead of .txt
+        self.save_to_db(url, title, desc_list, p_list)
 
         return True
     
+    def get_urls_of_keyword_thread(self, keyword, page_number):
+        """" Get urls of articles by keyword search in a page"""
+        page_url = f"https://vietnamnet.vn/tim-kiem-p{page_number}?q={keyword}"
+        content = requests.get(page_url).content
+        soup = BeautifulSoup(content, "html.parser")
+        titles = soup.find_all(class_=["horizontalPost__main-title", "vnn-title", "title-bold"])
+
+        if (len(titles) == 0):
+            self.logger.info(f"Couldn't find any news in {page_url} \nMaybe you sent too many requests, try using less workers")
+
+        articles_urls = list()
+
+        for title in titles:
+            full_url = title.find_all("a")[0].get("href")
+            if self.base_url not in full_url:
+                full_url = self.base_url + full_url
+            articles_urls.append(full_url)
+
+        return articles_urls
+
     def get_urls_of_type_thread(self, article_type, page_number):
         """" Get urls of articles in a specific type in a page"""
         page_url = f"https://vietnamnet.vn/{article_type}-page{page_number}"
